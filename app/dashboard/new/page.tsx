@@ -1,10 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileSpreadsheet, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,8 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
+import api from "@/services/api";
+import { ArrowLeft, FileSpreadsheet, Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Employee {
   id: number;
@@ -56,7 +56,7 @@ const AMOUNT_TYPES = {
   HOUR: 0,
   DAY: 1,
   WEEK: 2,
-  MONTH: 3
+  MONTH: 3,
 };
 
 export default function NewBudget() {
@@ -89,9 +89,9 @@ export default function NewBudget() {
       const { pv, commission } = JSON.parse(auth);
       setUserPV(Number(pv));
       setUserCommission(Number(commission));
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        commission: Number(commission)
+        commission: Number(commission),
       }));
     }
     fetchEmployees();
@@ -100,10 +100,10 @@ export default function NewBudget() {
   useEffect(() => {
     const total = calculateTotalBudget();
     const cost = calculateTotalCost();
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       total,
-      cost
+      cost,
     }));
   }, [formData.budget_employee]);
 
@@ -136,9 +136,12 @@ export default function NewBudget() {
     }));
   };
 
-  const handleEmployeeInputChange = (field: keyof EmployeeEntry, value: string) => {
+  const handleEmployeeInputChange = (
+    field: keyof EmployeeEntry,
+    value: string
+  ) => {
     let parsedValue: number = value === "" ? 0 : Number(value);
-    
+
     if (field === "profit_margin" || field === "dedication") {
       parsedValue = parsedValue / 100;
     }
@@ -178,7 +181,8 @@ export default function NewBudget() {
     // For non-PV 9 users, always set profit_margin to 100%
     const employeeToAdd = {
       ...currentEmployee,
-      profit_margin: userPV === 9 ? currentEmployee.profit_margin : DEFAULT_PROFIT_MARGIN,
+      profit_margin:
+        userPV === 9 ? currentEmployee.profit_margin : DEFAULT_PROFIT_MARGIN,
     };
 
     setFormData((prev) => ({
@@ -204,7 +208,7 @@ export default function NewBudget() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.budget_employee.length === 0) {
       toast({
         variant: "destructive",
@@ -242,18 +246,18 @@ export default function NewBudget() {
   };
 
   const formatCurrency = (value: string | number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(Number(value));
   };
 
   const getEmployeeName = (id: number) => {
-    return employees.find(emp => emp.id === id)?.name || '';
+    return employees.find((emp) => emp.id === id)?.name || "";
   };
 
   const getEmployeeCost = (id: number) => {
-    return employees.find(emp => emp.id === id)?.cost || '0';
+    return employees.find((emp) => emp.id === id)?.cost || "0";
   };
 
   const calculateEmployeeCost = (emp: EmployeeEntry) => {
@@ -297,7 +301,7 @@ export default function NewBudget() {
     const totalCost = formData.cost;
     const commissionValue = totalValue * formData.commission;
     const taxValue = totalValue * formData.tax;
-    
+
     return totalValue - totalCost - commissionValue - taxValue;
   };
 
@@ -374,7 +378,9 @@ export default function NewBudget() {
                         type="number"
                         step="0.1"
                         required
-                        value={formData.commission ? (formData.commission * 100) : ""}
+                        value={
+                          formData.commission ? formData.commission * 100 : ""
+                        }
                         onChange={handleInputChange}
                         disabled={isLoading}
                       />
@@ -387,7 +393,7 @@ export default function NewBudget() {
                         type="number"
                         step="0.1"
                         required
-                        value={formData.tax ? (formData.tax * 100) : ""}
+                        value={formData.tax ? formData.tax * 100 : ""}
                         onChange={handleInputChange}
                         disabled={isLoading}
                       />
@@ -428,7 +434,9 @@ export default function NewBudget() {
                     <Input
                       type="number"
                       value={currentEmployee.amount || ""}
-                      onChange={(e) => handleEmployeeInputChange("amount", e.target.value)}
+                      onChange={(e) =>
+                        handleEmployeeInputChange("amount", e.target.value)
+                      }
                       disabled={isLoading}
                     />
                   </div>
@@ -436,17 +444,30 @@ export default function NewBudget() {
                     <Label>Tipo</Label>
                     <Select
                       value={currentEmployee.amount_type.toString()}
-                      onValueChange={(value) => setCurrentEmployee(prev => ({ ...prev, amount_type: Number(value) }))}
+                      onValueChange={(value) =>
+                        setCurrentEmployee((prev) => ({
+                          ...prev,
+                          amount_type: Number(value),
+                        }))
+                      }
                       disabled={isLoading}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={AMOUNT_TYPES.HOUR.toString()}>Horas</SelectItem>
-                        <SelectItem value={AMOUNT_TYPES.DAY.toString()}>Dias</SelectItem>
-                        <SelectItem value={AMOUNT_TYPES.WEEK.toString()}>Semanas</SelectItem>
-                        <SelectItem value={AMOUNT_TYPES.MONTH.toString()}>Meses</SelectItem>
+                        <SelectItem value={AMOUNT_TYPES.HOUR.toString()}>
+                          Horas
+                        </SelectItem>
+                        <SelectItem value={AMOUNT_TYPES.DAY.toString()}>
+                          Dias
+                        </SelectItem>
+                        <SelectItem value={AMOUNT_TYPES.WEEK.toString()}>
+                          Semanas
+                        </SelectItem>
+                        <SelectItem value={AMOUNT_TYPES.MONTH.toString()}>
+                          Meses
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -455,8 +476,13 @@ export default function NewBudget() {
                     <Input
                       type="number"
                       step="0.1"
-                      value={currentEmployee.dedication * 100}
-                      onChange={(e) => handleEmployeeInputChange("dedication", (Number(e.target.value) / 100).toString())}
+                      // value={currentEmployee.dedication * 100}
+                      onChange={(e) =>
+                        handleEmployeeInputChange(
+                          "dedication",
+                          (Number(e.target.value) / 100).toString()
+                        )
+                      }
                       disabled={isLoading}
                     />
                   </div>
@@ -468,8 +494,17 @@ export default function NewBudget() {
                           <Input
                             type="number"
                             step="0.1"
-                            value={currentEmployee.profit_margin ? (currentEmployee.profit_margin * 100) : ""}
-                            onChange={(e) => handleEmployeeInputChange("profit_margin", e.target.value)}
+                            value={
+                              currentEmployee.profit_margin
+                                ? currentEmployee.profit_margin * 100
+                                : ""
+                            }
+                            onChange={(e) =>
+                              handleEmployeeInputChange(
+                                "profit_margin",
+                                e.target.value
+                              )
+                            }
                             disabled={isLoading}
                           />
                           <Button
@@ -501,38 +536,70 @@ export default function NewBudget() {
                 {formData.budget_employee.length > 0 && (
                   <>
                     <div className="mt-6">
-                      <Label className="mb-4 block">Funcionários Adicionados</Label>
+                      <Label className="mb-4 block">
+                        Funcionários Adicionados
+                      </Label>
                       <div className="rounded-md border">
                         <Table>
                           <TableHeader>
                             <TableRow>
                               <TableHead>Cargo</TableHead>
-                              <TableHead className="text-right">Custo Base</TableHead>
-                              <TableHead className="text-right">Quantidade</TableHead>
+                              <TableHead className="text-right">
+                                Custo Base
+                              </TableHead>
+                              <TableHead className="text-right">
+                                Quantidade
+                              </TableHead>
                               <TableHead className="text-right">Tipo</TableHead>
-                              <TableHead className="text-right">Dedicação</TableHead>
-                              {userPV === 9 && <TableHead className="text-right">Margem</TableHead>}
-                              <TableHead className="text-right">Valor Total</TableHead>
+                              <TableHead className="text-right">
+                                Dedicação
+                              </TableHead>
+                              {userPV === 9 && (
+                                <TableHead className="text-right">
+                                  Margem
+                                </TableHead>
+                              )}
+                              <TableHead className="text-right">
+                                Valor Total
+                              </TableHead>
                               <TableHead className="w-[50px]"></TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {formData.budget_employee.map((emp, index) => (
                               <TableRow key={index}>
-                                <TableCell>{getEmployeeName(emp.employee_id)}</TableCell>
-                                <TableCell className="text-right">{formatCurrency(getEmployeeCost(emp.employee_id))}</TableCell>
-                                <TableCell className="text-right">{emp.amount}</TableCell>
-                                <TableCell className="text-right">
-                                  {emp.amount_type === AMOUNT_TYPES.HOUR && 'Horas'}
-                                  {emp.amount_type === AMOUNT_TYPES.DAY && 'Dias'}
-                                  {emp.amount_type === AMOUNT_TYPES.WEEK && 'Semanas'}
-                                  {emp.amount_type === AMOUNT_TYPES.MONTH && 'Meses'}
+                                <TableCell>
+                                  {getEmployeeName(emp.employee_id)}
                                 </TableCell>
-                                <TableCell className="text-right">{(emp.dedication * 100).toFixed(1)}%</TableCell>
+                                <TableCell className="text-right">
+                                  {formatCurrency(
+                                    getEmployeeCost(emp.employee_id)
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {emp.amount}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {emp.amount_type === AMOUNT_TYPES.HOUR &&
+                                    "Horas"}
+                                  {emp.amount_type === AMOUNT_TYPES.DAY &&
+                                    "Dias"}
+                                  {emp.amount_type === AMOUNT_TYPES.WEEK &&
+                                    "Semanas"}
+                                  {emp.amount_type === AMOUNT_TYPES.MONTH &&
+                                    "Meses"}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {(emp.dedication * 100).toFixed(1)}%
+                                </TableCell>
                                 {userPV === 9 && (
-                                  <TableCell className="text-right">{(emp.profit_margin * 100).toFixed(1)}%</TableCell>
+                                  <TableCell className="text-right">
+                                    {(emp.profit_margin * 100).toFixed(1)}%
+                                  </TableCell>
                                 )}
-                                <TableCell className="text-right font-medium">{formatCurrency(calculateEmployeeTotal(emp))}</TableCell>
+                                <TableCell className="text-right font-medium">
+                                  {formatCurrency(calculateEmployeeTotal(emp))}
+                                </TableCell>
                                 <TableCell>
                                   <Button
                                     type="button"
@@ -555,12 +622,22 @@ export default function NewBudget() {
                       <Card className="bg-primary/5 border-2 border-primary/20 mb-6">
                         <CardContent className="p-6">
                           <div className="text-center">
-                            <h3 className="text-xl font-semibold mb-6">Margem de Lucro Total</h3>
-                            <div className={`text-4xl font-bold ${calculateNetProfit() >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                            <h3 className="text-xl font-semibold mb-6">
+                              Margem de Lucro Total
+                            </h3>
+                            <div
+                              className={`text-4xl font-bold ${
+                                calculateNetProfit() >= 0
+                                  ? "text-green-500 dark:text-green-400"
+                                  : "text-red-500 dark:text-red-400"
+                              }`}
+                            >
                               {formatCurrency(calculateNetProfit())}
                             </div>
                             <div className="mt-2 text-sm text-muted-foreground">
-                              {calculateNetProfit() >= 0 ? 'Lucro Líquido' : 'Prejuízo'}
+                              {calculateNetProfit() >= 0
+                                ? "Lucro Líquido"
+                                : "Prejuízo"}
                             </div>
                           </div>
                         </CardContent>
@@ -568,10 +645,14 @@ export default function NewBudget() {
                     )}
 
                     <div className="bg-muted/50 p-6 rounded-lg space-y-4">
-                      <h3 className="font-semibold text-lg">Detalhamento Financeiro</h3>
+                      <h3 className="font-semibold text-lg">
+                        Detalhamento Financeiro
+                      </h3>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-muted-foreground">Valor Total Bruto</p>
+                          <p className="text-sm text-muted-foreground">
+                            Valor Total Bruto
+                          </p>
                           <p className="text-lg font-medium">
                             {formatCurrency(formData.total)}
                           </p>
@@ -581,7 +662,10 @@ export default function NewBudget() {
                             Comissão ({(formData.commission * 100).toFixed(1)}%)
                           </p>
                           <p className="text-lg font-medium text-red-500 dark:text-red-400">
-                            -{formatCurrency(formData.total * formData.commission)}
+                            -
+                            {formatCurrency(
+                              formData.total * formData.commission
+                            )}
                           </p>
                         </div>
                         {userPV === 9 && (
@@ -595,7 +679,9 @@ export default function NewBudget() {
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm text-muted-foreground">Custo Total Base</p>
+                              <p className="text-sm text-muted-foreground">
+                                Custo Total Base
+                              </p>
                               <p className="text-lg font-medium text-red-500 dark:text-red-400">
                                 -{formatCurrency(formData.cost)}
                               </p>
