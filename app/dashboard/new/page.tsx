@@ -476,7 +476,7 @@ export default function NewBudget() {
                     <Input
                       type="number"
                       step="0.1"
-                      // value={currentEmployee.dedication * 100}
+                      value={currentEmployee.dedication * 100}
                       onChange={(e) =>
                         handleEmployeeInputChange(
                           "dedication",
