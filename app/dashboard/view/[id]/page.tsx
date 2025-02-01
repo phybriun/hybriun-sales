@@ -1,19 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileSpreadsheet, ArrowLeft, Download, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,8 +10,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import api from "@/services/api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import api from "@/services/api";
+import { ArrowLeft, Download, FileSpreadsheet, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface EmployeeFunction {
   name: string;
@@ -56,7 +55,7 @@ const AMOUNT_TYPES = {
   HOUR: 0,
   DAY: 1,
   WEEK: 2,
-  MONTH: 3
+  MONTH: 3,
 };
 
 export default function BudgetViewPage() {
@@ -103,9 +102,9 @@ export default function BudgetViewPage() {
   };
 
   const formatCurrency = (value: string | number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(Number(value));
   };
 
@@ -142,7 +141,7 @@ export default function BudgetViewPage() {
     const totalCost = Number(budget.cost);
     const commissionValue = totalValue * Number(budget.commission);
     const taxValue = totalValue * Number(budget.tax);
-    
+
     return totalValue - totalCost - commissionValue - taxValue;
   };
 
@@ -169,8 +168,10 @@ export default function BudgetViewPage() {
     if (!budget) return;
 
     try {
-      const response = await api.post('/generate/pdf', {
-        html: `
+      const response = await api.post(
+        "/generate/pdf",
+        {
+          html: `
           <html>
             <head>
               <style>
@@ -195,7 +196,7 @@ export default function BudgetViewPage() {
             </head>
             <body>
               <div class="logo">
-                <img src="https://hybriun.com.br/wp-content/uploads/2023/11/logo-hybriun-horizontal.png" alt="Hybriun Logo" />
+                <img src="https://vendas.hybriun.com.br/logo.png" alt="Hybriun Logo" />
               </div>
               <div class="header">
                 <div class="title">Detalhes do Orçamento</div>
@@ -224,22 +225,37 @@ export default function BudgetViewPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  ${budget.budget_employee.map(emp => `
+                  ${budget.budget_employee
+                    .map(
+                      (emp) => `
                     <tr>
                       <td>${emp.employee_function.name}</td>
-                      <td class="text-right">${formatCurrency(emp.employee_function.cost)}</td>
+                      <td class="text-right">${formatCurrency(
+                        emp.employee_function.cost
+                      )}</td>
                       <td class="text-right">${emp.amount}</td>
                       <td class="text-right">${
-                        emp.amount_type === AMOUNT_TYPES.HOUR ? 'Horas' :
-                        emp.amount_type === AMOUNT_TYPES.DAY ? 'Dias' :
-                        emp.amount_type === AMOUNT_TYPES.WEEK ? 'Semanas' :
-                        'Meses'
+                        emp.amount_type === AMOUNT_TYPES.HOUR
+                          ? "Horas"
+                          : emp.amount_type === AMOUNT_TYPES.DAY
+                          ? "Dias"
+                          : emp.amount_type === AMOUNT_TYPES.WEEK
+                          ? "Semanas"
+                          : "Meses"
                       }</td>
-                      <td class="text-right">${formatPercentage(emp.dedication)}</td>
-                      <td class="text-right">${formatPercentage(emp.profit_margin)}</td>
-                      <td class="text-right">${formatCurrency(calculateEmployeeTotal(emp))}</td>
+                      <td class="text-right">${formatPercentage(
+                        emp.dedication
+                      )}</td>
+                      <td class="text-right">${formatPercentage(
+                        emp.profit_margin
+                      )}</td>
+                      <td class="text-right">${formatCurrency(
+                        calculateEmployeeTotal(emp)
+                      )}</td>
                     </tr>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </tbody>
               </table>
 
@@ -251,12 +267,20 @@ export default function BudgetViewPage() {
                     <div class="value">${formatCurrency(budget.total)}</div>
                   </div>
                   <div>
-                    <div class="label">Comissão (${formatPercentage(budget.commission)})</div>
-                    <div class="value red">-${formatCurrency(Number(budget.total) * Number(budget.commission))}</div>
+                    <div class="label">Comissão (${formatPercentage(
+                      budget.commission
+                    )})</div>
+                    <div class="value red">-${formatCurrency(
+                      Number(budget.total) * Number(budget.commission)
+                    )}</div>
                   </div>
                   <div>
-                    <div class="label">Impostos (${formatPercentage(budget.tax)})</div>
-                    <div class="value red">-${formatCurrency(Number(budget.total) * Number(budget.tax))}</div>
+                    <div class="label">Impostos (${formatPercentage(
+                      budget.tax
+                    )})</div>
+                    <div class="value red">-${formatCurrency(
+                      Number(budget.total) * Number(budget.tax)
+                    )}</div>
                   </div>
                   <div>
                     <div class="label">Custo Total Base</div>
@@ -264,20 +288,24 @@ export default function BudgetViewPage() {
                   </div>
                   <div>
                     <div class="label">Margem de Lucro Total</div>
-                    <div class="value ${calculateNetProfit(budget) >= 0 ? 'green' : 'red'}">${formatCurrency(calculateNetProfit(budget))}</div>
+                    <div class="value ${
+                      calculateNetProfit(budget) >= 0 ? "green" : "red"
+                    }">${formatCurrency(calculateNetProfit(budget))}</div>
                   </div>
                 </div>
               </div>
             </body>
           </html>
-        `
-      }, {
-        responseType: 'blob'
-      });
+        `,
+        },
+        {
+          responseType: "blob",
+        }
+      );
 
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = `orcamento-${budget.pipedrive_code}.pdf`;
       document.body.appendChild(link);
@@ -297,8 +325,10 @@ export default function BudgetViewPage() {
     if (!budget) return;
 
     try {
-      const response = await api.post('/generate/pdf', {
-        html: `
+      const response = await api.post(
+        "/generate/pdf",
+        {
+          html: `
           <html>
             <head>
               <style>
@@ -322,7 +352,7 @@ export default function BudgetViewPage() {
             </head>
             <body>
               <div class="logo">
-                <img src="https://hybriun.com.br/wp-content/uploads/2023/11/logo-hybriun-horizontal.png" alt="Hybriun Logo" />
+                <img src="https://vendas.hybriun.com.br/logo.png" alt="Hybriun Logo" />
               </div>
               <div class="header">
                 <div class="title">Orçamento</div>
@@ -348,19 +378,28 @@ export default function BudgetViewPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  ${budget.budget_employee.map(emp => `
+                  ${budget.budget_employee
+                    .map(
+                      (emp) => `
                     <tr>
                       <td>${emp.employee_function.name}</td>
                       <td class="text-right">${emp.amount}</td>
                       <td class="text-right">${
-                        emp.amount_type === AMOUNT_TYPES.HOUR ? 'Horas' :
-                        emp.amount_type === AMOUNT_TYPES.DAY ? 'Dias' :
-                        emp.amount_type === AMOUNT_TYPES.WEEK ? 'Semanas' :
-                        'Meses'
+                        emp.amount_type === AMOUNT_TYPES.HOUR
+                          ? "Horas"
+                          : emp.amount_type === AMOUNT_TYPES.DAY
+                          ? "Dias"
+                          : emp.amount_type === AMOUNT_TYPES.WEEK
+                          ? "Semanas"
+                          : "Meses"
                       }</td>
-                      <td class="text-right">${formatPercentage(emp.dedication)}</td>
+                      <td class="text-right">${formatPercentage(
+                        emp.dedication
+                      )}</td>
                     </tr>
-                  `).join('')}
+                  `
+                    )
+                    .join("")}
                 </tbody>
               </table>
 
@@ -369,24 +408,32 @@ export default function BudgetViewPage() {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                   <div>
                     <div class="label">Valor Total</div>
-                    <div class="value indigo">${formatCurrency(budget.total)}</div>
+                    <div class="value indigo">${formatCurrency(
+                      budget.total
+                    )}</div>
                   </div>
                   <div>
-                    <div class="label">Comissão (${formatPercentage(budget.commission)})</div>
-                    <div class="value red">-${formatCurrency(Number(budget.total) * Number(budget.commission))}</div>
+                    <div class="label">Comissão (${formatPercentage(
+                      budget.commission
+                    )})</div>
+                    <div class="value red">-${formatCurrency(
+                      Number(budget.total) * Number(budget.commission)
+                    )}</div>
                   </div>
                 </div>
               </div>
             </body>
           </html>
-        `
-      }, {
-        responseType: 'blob'
-      });
+        `,
+        },
+        {
+          responseType: "blob",
+        }
+      );
 
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = `orcamento-simplificado-${budget.pipedrive_code}.pdf`;
       document.body.appendChild(link);
@@ -421,8 +468,12 @@ export default function BudgetViewPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-10">
               <FileSpreadsheet className="h-12 w-12 text-muted-foreground mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Orçamento não encontrado</h2>
-              <p className="text-muted-foreground mb-6">O orçamento que você está procurando não existe ou foi removido.</p>
+              <h2 className="text-xl font-semibold mb-2">
+                Orçamento não encontrado
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                O orçamento que você está procurando não existe ou foi removido.
+              </p>
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard")}
@@ -482,12 +533,18 @@ export default function BudgetViewPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-muted-foreground">Código Pipedrive</div>
-                  <div className="text-lg font-medium">{budget.pipedrive_code}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Código Pipedrive
+                  </div>
+                  <div className="text-lg font-medium">
+                    {budget.pipedrive_code}
+                  </div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Cliente</div>
-                  <div className="text-lg font-medium">{budget.customer_name}</div>
+                  <div className="text-lg font-medium">
+                    {budget.customer_name}
+                  </div>
                 </div>
               </div>
 
@@ -496,11 +553,15 @@ export default function BudgetViewPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Cargo</TableHead>
-                      {userPV === 9 && <TableHead className="text-right">Custo Base</TableHead>}
+                      {userPV === 9 && (
+                        <TableHead className="text-right">Custo Base</TableHead>
+                      )}
                       <TableHead className="text-right">Quantidade</TableHead>
                       <TableHead className="text-right">Tipo</TableHead>
                       <TableHead className="text-right">Dedicação</TableHead>
-                      {userPV === 9 && <TableHead className="text-right">Margem</TableHead>}
+                      {userPV === 9 && (
+                        <TableHead className="text-right">Margem</TableHead>
+                      )}
                       <TableHead className="text-right">Valor Total</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -513,12 +574,14 @@ export default function BudgetViewPage() {
                             {formatCurrency(emp.employee_function.cost)}
                           </TableCell>
                         )}
-                        <TableCell className="text-right">{emp.amount}</TableCell>
                         <TableCell className="text-right">
-                          {emp.amount_type === AMOUNT_TYPES.HOUR && 'Horas'}
-                          {emp.amount_type === AMOUNT_TYPES.DAY && 'Dias'}
-                          {emp.amount_type === AMOUNT_TYPES.WEEK && 'Semanas'}
-                          {emp.amount_type === AMOUNT_TYPES.MONTH && 'Meses'}
+                          {emp.amount}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {emp.amount_type === AMOUNT_TYPES.HOUR && "Horas"}
+                          {emp.amount_type === AMOUNT_TYPES.DAY && "Dias"}
+                          {emp.amount_type === AMOUNT_TYPES.WEEK && "Semanas"}
+                          {emp.amount_type === AMOUNT_TYPES.MONTH && "Meses"}
                         </TableCell>
                         <TableCell className="text-right">
                           {formatPercentage(emp.dedication)}
@@ -541,12 +604,22 @@ export default function BudgetViewPage() {
                 <Card className="bg-primary/5 border-2 border-primary/20">
                   <CardContent className="p-6">
                     <div className="text-center">
-                      <h3 className="text-xl font-semibold mb-6">Margem de Lucro Total</h3>
-                      <div className={`text-4xl font-bold ${calculateNetProfit(budget) >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                      <h3 className="text-xl font-semibold mb-6">
+                        Margem de Lucro Total
+                      </h3>
+                      <div
+                        className={`text-4xl font-bold ${
+                          calculateNetProfit(budget) >= 0
+                            ? "text-green-500 dark:text-green-400"
+                            : "text-red-500 dark:text-red-400"
+                        }`}
+                      >
                         {formatCurrency(calculateNetProfit(budget))}
                       </div>
                       <div className="mt-2 text-sm text-muted-foreground">
-                        {calculateNetProfit(budget) >= 0 ? 'Lucro Líquido' : 'Prejuízo'}
+                        {calculateNetProfit(budget) >= 0
+                          ? "Lucro Líquido"
+                          : "Prejuízo"}
                       </div>
                     </div>
                   </CardContent>
@@ -554,11 +627,15 @@ export default function BudgetViewPage() {
               )}
 
               <div className="bg-muted/50 p-6 rounded-lg space-y-4">
-                <h3 className="font-semibold text-lg">Detalhamento Financeiro</h3>
+                <h3 className="font-semibold text-lg">
+                  Detalhamento Financeiro
+                </h3>
                 {userPV === 9 ? (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="text-sm text-muted-foreground">Valor Total Bruto</div>
+                      <div className="text-sm text-muted-foreground">
+                        Valor Total Bruto
+                      </div>
                       <div className="text-lg font-medium">
                         {formatCurrency(budget.total)}
                       </div>
@@ -568,7 +645,10 @@ export default function BudgetViewPage() {
                         Comissão ({formatPercentage(budget.commission)})
                       </div>
                       <div className="text-lg font-medium text-red-500 dark:text-red-400">
-                        -{formatCurrency(Number(budget.total) * Number(budget.commission))}
+                        -
+                        {formatCurrency(
+                          Number(budget.total) * Number(budget.commission)
+                        )}
                       </div>
                     </div>
                     <div>
@@ -576,11 +656,16 @@ export default function BudgetViewPage() {
                         Impostos ({formatPercentage(budget.tax)})
                       </div>
                       <div className="text-lg font-medium text-red-500 dark:text-red-400">
-                        -{formatCurrency(Number(budget.total) * Number(budget.tax))}
+                        -
+                        {formatCurrency(
+                          Number(budget.total) * Number(budget.tax)
+                        )}
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Custo Total Base</div>
+                      <div className="text-sm text-muted-foreground">
+                        Custo Total Base
+                      </div>
                       <div className="text-lg font-medium text-red-500 dark:text-red-400">
                         -{formatCurrency(budget.cost)}
                       </div>
@@ -622,8 +707,8 @@ export default function BudgetViewPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir o orçamento {budget?.id} - {budget?.customer_name}?
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir o orçamento {budget?.id} -{" "}
+              {budget?.customer_name}? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
